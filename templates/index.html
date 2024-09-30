@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>特殊订单图像搜索</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            max-width: 90%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fafafa;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #1a73e8;
+            font-weight: 500;
+        }
+        .search-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #imageInput {
+            display: none;
+        }
+        .custom-file-upload {
+            border: 2px solid #1a73e8;
+            display: inline-block;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #fff;
+            color: #1a73e8;
+            border-radius: 4px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .custom-file-upload:hover {
+            background-color: #1a73e8;
+            color: #fff;
+        }
+        button {
+            background-color: #1a73e8;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #1558b0;
+        }
+        #uploadedImageContainer {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #uploadedImageContainer img {
+            max-width: 300px;
+            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        #results {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1em;
+            justify-content: center;
+        }
+        #results img {
+            width: 300px;
+            display: block;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        #results img:hover {
+            transform: scale(1.05);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.8);
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+        }
+        .modal-content, #caption {
+            animation-name: zoom;
+            animation-duration: 0.6s;
+        }
+        @keyframes zoom {
+            from {transform: scale(0)}
+            to {transform: scale(1)}
+        }
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>特殊订单图像搜索</h1>
+    <div class="search-container">
+        <label for="imageInput" class="custom-file-upload">
+            选择图片
+        </label>
+        <input type="file" id="imageInput" accept="image/*" onchange="previewImage()">
+        <button onclick="searchImage()">搜索</button>
+    </div>
+    <div id="uploadedImageContainer"></div>
+    <div id="results"></div>
+
+    <!-- 模态框 -->
+    <div id="myModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="img01">
+        <div id="caption"></div>
+    </div>
+
+    <script>
+        function previewImage() {
+            const imageInput = document.getElementById('imageInput');
+            const uploadedImageContainer = document.getElementById('uploadedImageContainer');
+            
+            if (imageInput.files && imageInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedImageContainer.innerHTML = `<img src="${e.target.result}" alt="Uploaded Image">`;
+                }
+                reader.readAsDataURL(imageInput.files[0]);
+            }
+        }
+
+        async function searchImage() {
+            const imageInput = document.getElementById('imageInput');
+            const resultsDiv = document.getElementById('results');
+            
+            if (!imageInput.files[0]) {
+                alert('请选择一张图片');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', imageInput.files[0]);
+
+            try {
+                const response = await axios.post('/search', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                
+                const imageUrls = response.data;
+                resultsDiv.innerHTML = imageUrls;
+            } catch (error) {
+                console.error('搜索出错:', error);
+                resultsDiv.innerHTML = '<div class="image-container"><div class="placeholder">搜索时发生错误，请稍后再试</div></div>';
+            }
+        }
+
+        function openImageInModal(src) {
+            const modal = document.getElementById("myModal");
+            const modalImg = document.getElementById("img01");
+            modal.style.display = "block";
+            modalImg.src = src;
+        }
+
+        function closeModal() {
+            const modal = document.getElementById("myModal");
+            modal.style.display = "none";
+        }
+    </script>
+</body>
+</html>
