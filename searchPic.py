@@ -10,14 +10,14 @@ from alibabacloud_tea_util.models import RuntimeOptions
 
 def searchImageByPic(image_bytes):
     # 读取key.gitignore文件中的access_key_id和access_key_secret
-    #config_parser = configparser.ConfigParser()
-    #config_parser.read('ali.key')
-    #access_key_id = config_parser.get('DEFAULT', 'access_key_id')
-    #access_key_secret = config_parser.get('DEFAULT', 'access_key_secret')
+    config_parser = configparser.ConfigParser()
+    config_parser.read('ali.key')
+    access_key_id = config_parser.get('DEFAULT', 'access_key_id')
+    access_key_secret = config_parser.get('DEFAULT', 'access_key_secret')
 
     # 从环境变量获取 AccessKey ID 和 AccessKey Secret
-    access_key_id = os.environ.get('ALIBABA_CLOUD_ACCESS_KEY_ID')
-    access_key_secret = os.environ.get('ALIBABA_CLOUD_ACCESS_KEY_SECRET')
+    #access_key_id = os.environ.get('ALIBABA_CLOUD_ACCESS_KEY_ID')
+    #access_key_secret = os.environ.get('ALIBABA_CLOUD_ACCESS_KEY_SECRET')
 
     #if not access_key_id or not access_key_secret:
     #    raise ValueError("请设置 ALIBABA_CLOUD_ACCESS_KEY_ID 和 ALIBABA_CLOUD_ACCESS_KEY_SECRET 环境变量")
